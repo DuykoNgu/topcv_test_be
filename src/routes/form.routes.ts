@@ -3,6 +3,8 @@ import { FormController } from "../controllers/form.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { requireAdmin, requireAdminOrStaff } from "../middleware/role.middleware";
 import { validateRequest } from "../middleware/validation.middleware";
+import { createFormSchema, updateFormSchema } from "../schemas/form.schema";
+
 
 const router = Router();
 const formController = new FormController();
@@ -87,7 +89,8 @@ router.get('/:id', authMiddleware, requireAdminOrStaff, formController.getFormBy
  *       201:
  *         description: Form created
  */
-router.post('/', authMiddleware, requireAdmin, validateRequest, formController.createForm.bind(formController));
+router.post('/', authMiddleware, requireAdmin, validateRequest(createFormSchema), formController.createForm.bind(formController));
+
 
 /**
  * @swagger
@@ -118,7 +121,8 @@ router.post('/', authMiddleware, requireAdmin, validateRequest, formController.c
  *       200:
  *         description: Form updated
  */
-router.put('/:id', authMiddleware, requireAdmin, validateRequest, formController.updateForm.bind(formController));
+router.put('/:id', authMiddleware, requireAdmin, validateRequest(updateFormSchema), formController.updateForm.bind(formController));
+
 
 /**
  * @swagger

@@ -3,6 +3,8 @@ import { SubmissionController } from "../controllers/submission.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { requireAdmin, requireAdminOrStaff } from "../middleware/role.middleware";
 import { validateRequest } from "../middleware/validation.middleware";
+import { submitFormSchema } from "../schemas/submission.schema";
+
 
 const submissionController = new SubmissionController();
 
@@ -67,7 +69,8 @@ export const formSubmitRouter = Router();
  *       201:
  *         description: Submission created
  */
-formSubmitRouter.post('/:formId/submit', authMiddleware, requireAdminOrStaff, validateRequest, submissionController.submitForm.bind(submissionController));
+formSubmitRouter.post('/:formId/submit', authMiddleware, requireAdminOrStaff, validateRequest(submitFormSchema), submissionController.submitForm.bind(submissionController));
+
 
 /**
  * @swagger

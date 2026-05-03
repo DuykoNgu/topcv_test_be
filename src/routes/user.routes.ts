@@ -1,9 +1,12 @@
 import { Router } from "express";
 import { UserController } from "../controllers/user.controller";
-import { authMiddleware, optionalAuth } from "../middleware/auth.middleware";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { registerSchema, loginSchema } from "../schemas/user.schema";
+import { validateRequest } from "../middleware/validation.middleware";
 
 const router = Router();
 const userController = new UserController();
+
 
 /**
  * @swagger
@@ -39,7 +42,8 @@ const userController = new UserController();
  *       201:
  *         description: User created successfully
  */
-router.post("/register", userController.register.bind(userController));
+router.post("/register", validateRequest(registerSchema), userController.register.bind(userController));
+
 
 /**
  * @swagger
@@ -65,7 +69,8 @@ router.post("/register", userController.register.bind(userController));
  *       200:
  *         description: Login successful
  */
-router.post("/login", userController.login.bind(userController));
+router.post("/login", validateRequest(loginSchema), userController.login.bind(userController));
+
 
 /**
  * @swagger

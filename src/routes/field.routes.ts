@@ -3,6 +3,8 @@ import { FieldController } from "../controllers/field.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { requireAdmin } from "../middleware/role.middleware";
 import { validateRequest } from "../middleware/validation.middleware";
+import { createFieldSchema, updateFieldSchema } from "../schemas/field.schema";
+
 
 const router = Router();
 const fieldController = new FieldController();
@@ -52,7 +54,8 @@ const fieldController = new FieldController();
  *       201:
  *         description: Field created
  */
-router.post('/:formId/fields', authMiddleware, requireAdmin, validateRequest, fieldController.createField.bind(fieldController));
+router.post('/:formId/fields', authMiddleware, requireAdmin, validateRequest(createFieldSchema), fieldController.createField.bind(fieldController));
+
 
 /**
  * @swagger
@@ -94,7 +97,8 @@ router.post('/:formId/fields', authMiddleware, requireAdmin, validateRequest, fi
  *       200:
  *         description: Field updated
  */
-router.put('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateRequest, fieldController.updateField.bind(fieldController));
+router.put('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateRequest(updateFieldSchema), fieldController.updateField.bind(fieldController));
+
 
 /**
  * @swagger
