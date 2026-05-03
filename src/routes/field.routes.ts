@@ -7,13 +7,119 @@ import { validateRequest } from "../middleware/validation.middleware";
 const router = Router();
 const fieldController = new FieldController();
 
-// POST /api/forms/:formId/fields — ADMIN only
+/**
+ * @swagger
+ * tags:
+ *   name: Fields
+ *   description: Form field management
+ */
+
+/**
+ * @swagger
+ * /api/forms/{formId}/fields:
+ *   post:
+ *     summary: Create a new field for a form (Admin only)
+ *     tags: [Fields]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: formId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - label
+ *               - type
+ *             properties:
+ *               label:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               options:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               required:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Field created
+ */
 router.post('/:formId/fields', authMiddleware, requireAdmin, validateRequest, fieldController.createField.bind(fieldController));
 
-// PUT /api/forms/:formId/fields/:fieldId — ADMIN only
+/**
+ * @swagger
+ * /api/forms/{formId}/fields/{fieldId}:
+ *   put:
+ *     summary: Update a field (Admin only)
+ *     tags: [Fields]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: formId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: fieldId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               label:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               options:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               required:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Field updated
+ */
 router.put('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateRequest, fieldController.updateField.bind(fieldController));
 
-// DELETE /api/forms/:formId/fields/:fieldId — ADMIN only
+/**
+ * @swagger
+ * /api/forms/{formId}/fields/{fieldId}:
+ *   delete:
+ *     summary: Delete a field (Admin only)
+ *     tags: [Fields]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: formId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: fieldId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Field deleted
+ */
 router.delete('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateRequest, fieldController.deleteField.bind(fieldController));
 
 export default router;
+

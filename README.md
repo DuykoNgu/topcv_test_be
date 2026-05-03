@@ -65,6 +65,18 @@ npm start
 
 ---
 
+## 📖 Tài liệu API (API Documentation)
+Dự án tích hợp **Swagger UI** giúp việc tra cứu và kiểm tra API trở nên trực quan và dễ dàng.
+
+- **Link truy cập**: `http://localhost:3000/api-docs`
+- **Tính năng**:
+  - Liệt kê đầy đủ các endpoint (Users, Forms, Fields, Submissions).
+  - Thử nghiệm API trực tiếp trên trình duyệt (Interactive Testing).
+  - Hỗ trợ xác thực JWT: Nhấn nút **Authorize** và nhập `Bearer <your_token>` để test các API yêu cầu quyền truy cập.
+
+---
+
+
 ## 🗄 Cấu trúc Database (Database Schema)
 
 Hệ thống sử dụng các bảng chính sau:

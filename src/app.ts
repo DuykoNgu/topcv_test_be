@@ -6,7 +6,10 @@ import userRoutes from "./routes/user.routes";
 import formRoutes from "./routes/form.routes";
 import fieldRoutes from "./routes/field.routes";
 import { submissionRouter, formSubmitRouter } from "./routes/submission.routes";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger";
 import { errorHandler } from "./middleware/auth.middleware";
+
 
 const app = express();
 app.use(cors());
@@ -18,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to TOPCV Test API" });
 });
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 app.use("/api/forms", formRoutes); 
 app.use("/api/forms", fieldRoutes);

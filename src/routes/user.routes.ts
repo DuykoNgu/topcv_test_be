@@ -5,14 +5,127 @@ import { authMiddleware, optionalAuth } from "../middleware/auth.middleware";
 const router = Router();
 const userController = new UserController();
 
-// Auth routes
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management and authentication
+ */
+
+/**
+ * @swagger
+ * /api/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ */
 router.post("/register", userController.register.bind(userController));
+
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ */
 router.post("/login", userController.login.bind(userController));
+
+/**
+ * @swagger
+ * /api/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Token refreshed
+ */
 router.post("/refresh-token", userController.refreshToken.bind(userController));
+
+/**
+ * @swagger
+ * /api/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ */
 router.post("/logout", authMiddleware, userController.logout.bind(userController));
 
 // User routes
+/**
+ * @swagger
+ * /api:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of users
+ */
 router.get("/", authMiddleware, userController.getAllUsers.bind(userController));
+
+/**
+ * @swagger
+ * /api/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User found
+ */
 router.get("/:id", authMiddleware, userController.getUserById.bind(userController));
 
 export default router;

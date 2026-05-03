@@ -7,22 +7,138 @@ import { validateRequest } from "../middleware/validation.middleware";
 const router = Router();
 const formController = new FormController();
 
-// GET /api/forms — ADMIN only (list all forms including drafts)
+/**
+ * @swagger
+ * tags:
+ *   name: Forms
+ *   description: Form management
+ */
+
+/**
+ * @swagger
+ * /api/forms:
+ *   get:
+ *     summary: List all forms (Admin only)
+ *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of forms
+ */
 router.get('/', authMiddleware, requireAdmin, formController.getAllForms.bind(formController));
 
-// GET /api/forms/active — STAFF/ADMIN (forms available for submission)
+/**
+ * @swagger
+ * /api/forms/active:
+ *   get:
+ *     summary: List active forms (Staff/Admin)
+ *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of active forms
+ */
 router.get('/active', authMiddleware, requireAdminOrStaff, formController.getActiveForms.bind(formController));
 
-// GET /api/forms/:id — STAFF/ADMIN (view form details)
+/**
+ * @swagger
+ * /api/forms/{id}:
+ *   get:
+ *     summary: Get form by ID
+ *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Form details
+ */
 router.get('/:id', authMiddleware, requireAdminOrStaff, formController.getFormById.bind(formController));
 
-// POST /api/forms — ADMIN only
+/**
+ * @swagger
+ * /api/forms:
+ *   post:
+ *     summary: Create a new form (Admin only)
+ *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Form created
+ */
 router.post('/', authMiddleware, requireAdmin, validateRequest, formController.createForm.bind(formController));
 
-// PUT /api/forms/:id — ADMIN only
+/**
+ * @swagger
+ * /api/forms/{id}:
+ *   put:
+ *     summary: Update a form (Admin only)
+ *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Form updated
+ */
 router.put('/:id', authMiddleware, requireAdmin, validateRequest, formController.updateForm.bind(formController));
 
-// DELETE /api/forms/:id — ADMIN only
+/**
+ * @swagger
+ * /api/forms/{id}:
+ *   delete:
+ *     summary: Delete a form (Admin only)
+ *     tags: [Forms]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Form deleted
+ */
 router.delete('/:id', authMiddleware, requireAdmin, validateRequest, formController.deleteForm.bind(formController));
 
 export default router;
+
