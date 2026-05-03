@@ -6,7 +6,7 @@ export class FieldController {
   private readonly fieldService = serviceFactory.createFieldService();
 
   /**
-   * POST /api/forms/:formId/fields
+   * Tạo một trường thông tin mới cho một form.
    */
   async createField(req: Request, res: Response) {
     try {
@@ -29,7 +29,7 @@ export class FieldController {
   }
 
   /**
-   * PUT /api/forms/:formId/fields/:fieldId
+   * Cập nhật thông tin của một trường trong form.
    */
   async updateField(req: Request, res: Response) {
     try {
@@ -56,7 +56,7 @@ export class FieldController {
   }
 
   /**
-   * DELETE /api/forms/:formId/fields/:fieldId
+   * Xóa một trường khỏi form (xóa mềm).
    */
   async deleteField(req: Request, res: Response) {
     try {

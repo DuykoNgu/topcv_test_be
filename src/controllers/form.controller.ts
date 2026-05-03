@@ -6,7 +6,7 @@ export class FormController {
   private readonly formService = serviceFactory.createFormService();
 
   /**
-   * GET /api/forms?page=&limit=
+   * Lấy danh sách tất cả các form có phân trang.
    */
   async getAllForms(req: Request, res: Response) {
     try {
@@ -29,7 +29,7 @@ export class FormController {
   }
 
   /**
-   * GET /api/forms/active
+   * Lấy danh sách các form đang ở trạng thái ACTIVE (dành cho nhân viên).
    */
   async getActiveForms(req: Request, res: Response) {
     try {
@@ -41,7 +41,7 @@ export class FormController {
   }
 
   /**
-   * GET /api/forms/:id
+   * Lấy thông tin chi tiết của một form cụ thể theo ID.
    */
   async getFormById(req: Request, res: Response) {
     try {
@@ -57,7 +57,7 @@ export class FormController {
   }
 
   /**
-   * POST /api/forms
+   * Tạo một mẫu form mới.
    */
   async createForm(req: Request, res: Response) {
     try {
@@ -73,7 +73,7 @@ export class FormController {
   }
 
   /**
-   * PUT /api/forms/:id
+   * Cập nhật thông tin của một mẫu form hiện có.
    */
   async updateForm(req: Request, res: Response) {
     try {
@@ -95,7 +95,7 @@ export class FormController {
   }
 
   /**
-   * DELETE /api/forms/:id
+   * Xóa một mẫu form (xóa mềm).
    */
   async deleteForm(req: Request, res: Response) {
     try {

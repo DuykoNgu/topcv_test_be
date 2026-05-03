@@ -7,11 +7,17 @@ import jwt from "jsonwebtoken";
 export class UserService {
   private userRepository = new UserRepository();
 
+  /**
+   * Kiểm tra định dạng email hợp lệ.
+   */
   validateEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
+  /**
+   * Kiểm tra tính hợp lệ của dữ liệu đăng ký.
+   */
   validateRegister(data: {
     username?: string;
     email?: string;
@@ -41,6 +47,9 @@ export class UserService {
     }
   }
 
+  /**
+   * Kiểm tra tính hợp lệ của dữ liệu đăng nhập.
+   */
   validateLogin(data: { email?: string; password?: string }): void {
     if (!data) {
       throw { statusCode: 400, message: "Thiếu dữ liệu request body" };
@@ -51,6 +60,9 @@ export class UserService {
     }
   }
 
+  /**
+   * Thực hiện đăng ký tài khoản người dùng mới.
+   */
   async register(data: {
     username: string;
     email: string;
@@ -95,6 +107,9 @@ export class UserService {
     return { message: "User created successfully", data: { user, token } };
   }
 
+  /**
+   * Thực hiện xác thực người dùng và đăng nhập.
+   */
   async login(data: { email: string; password: string }) {
     this.validateLogin(data);
     const { email, password } = data;
@@ -125,6 +140,9 @@ export class UserService {
     return { message: "Login successful", data: { user, token, refreshToken } };
   }
 
+  /**
+   * Tạo Access Token (JWT) cho người dùng.
+   */
   generateToken(user: User): string {
     return jwt.sign(
       {
@@ -137,6 +155,9 @@ export class UserService {
     );
   }
 
+  /**
+   * Tạo Refresh Token (JWT) cho người dùng.
+   */
   generateRefreshToken(user: User): string {
     return jwt.sign(
       { id: user.id, email: user.email },
@@ -145,6 +166,9 @@ export class UserService {
     );
   }
 
+  /**
+   * Lưu trữ Refresh Token vào cơ sở dữ liệu.
+   */
   async storeRefreshToken(userId: string, refreshToken: string): Promise<string> {
     const tokenHash = await bcrypt.hash(refreshToken, 10);
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -154,6 +178,9 @@ export class UserService {
     return refreshToken;
   }
 
+  /**
+   * Cấp mới Access Token bằng Refresh Token.
+   */
   async refreshToken(refreshToken: string) {
     if (!refreshToken) {
       throw { statusCode: 400, message: "Refresh token is required" };
@@ -187,6 +214,9 @@ export class UserService {
     };
   }
 
+  /**
+   * Đăng xuất người dùng và thu hồi tất cả Refresh Tokens.
+   */
   async logout(userId: string) {
     if (!userId) {
       throw { statusCode: 400, message: "User ID is required" };
@@ -196,10 +226,16 @@ export class UserService {
     return { message: "Logged out successfully" };
   }
 
+  /**
+   * Xác thực tính hợp lệ của token.
+   */
   verifyToken(token: string): object {
     return jwt.verify(token, process.env.JWT_SECRET || "secret") as object;
   }
 
+  /**
+   * Lấy thông tin cá nhân của người dùng.
+   */
   async getProfile(userId: string) {
     const user = await this.userRepository.findById(userId, {
       select: {
@@ -218,6 +254,9 @@ export class UserService {
     return user;
   }
 
+  /**
+   * Lấy danh sách tất cả người dùng trong hệ thống.
+   */
   async getAllUsers(): Promise<User[]> {
     return this.userRepository.findAll();
   }

@@ -38,7 +38,10 @@ export class FormService {
   };
 
   /**
-   * Lấy danh sách form có phân trang (kèm fields)
+   * Lấy danh sách các mẫu form có phân trang.
+   * Thường dùng cho trang quản trị (Admin).
+   * @param skip Số bản ghi bỏ qua.
+   * @param take Số bản ghi cần lấy.
    */
   async getPaginatedForms(skip: number, take: number): Promise<{ data: any[]; total: number }> {
     return this.formRepository.findWithPagination(skip, take, {
@@ -48,7 +51,8 @@ export class FormService {
   }
 
   /**
-   * Lấy chi tiết 1 form theo ID (kèm fields)
+   * Truy vấn chi tiết một mẫu form dựa trên ID.
+   * @param id ID của form cần lấy thông tin.
    */
   async getFormById(id: string): Promise<any | null> {
     return this.formRepository.findById(id, {
@@ -57,7 +61,8 @@ export class FormService {
   }
 
   /**
-   * Lấy tất cả form active, sắp xếp theo trường `order`
+   * Lấy danh sách tất cả các form đang ở trạng thái ACTIVE (đang hoạt động).
+   * Thường dùng cho nhân viên để thực hiện điền form.
    */
   async getActiveForms(): Promise<any[]> {
     return this.formRepository.findActiveForSubmission({
@@ -67,7 +72,9 @@ export class FormService {
   }
 
   /**
-   * Tạo form mới và trả về form với danh sách fields
+   * Tạo một mẫu form mới trong hệ thống.
+   * @param data Thông tin của form mới.
+   * @param userId ID của người thực hiện tạo form.
    */
   async createForm(data: any, userId?: string): Promise<any> {
     const formData = {
@@ -81,7 +88,10 @@ export class FormService {
   }
 
   /**
-   * Cập nhật form theo ID và trả về form đã cập nhật (kèm fields)
+   * Cập nhật thông tin của một mẫu form hiện có.
+   * @param id ID của form cần cập nhật.
+   * @param data Dữ liệu cập nhật mới.
+   * @param userId ID của người thực hiện cập nhật.
    */
   async updateForm(id: string, data: any, userId?: string): Promise<any | null> {
     const formData = {
@@ -94,7 +104,9 @@ export class FormService {
   }
 
   /**
-   * Xóa mềm form theo ID và trả về form đã xóa
+   * Thực hiện xóa mềm (soft delete) một mẫu form khỏi hệ thống.
+   * @param id ID của form cần xóa.
+   * @param userId ID của người thực hiện thao tác xóa.
    */
   async deleteForm(id: string, userId?: string): Promise<any | null> {
     return this.formRepository.softDelete(id, {

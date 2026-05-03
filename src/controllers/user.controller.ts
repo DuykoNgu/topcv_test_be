@@ -4,6 +4,9 @@ import { UserService } from "../services/user.service";
 export class UserController {
   private userService = new UserService();
 
+  /**
+   * Đăng ký tài khoản người dùng mới.
+   */
   async register(req: Request, res: Response) {
     try {
       const result = await this.userService.register(req.body);
@@ -14,6 +17,9 @@ export class UserController {
     }
   }
 
+  /**
+   * Đăng nhập vào hệ thống.
+   */
   async login(req: Request, res: Response) {
     try {
       const result = await this.userService.login(req.body);
@@ -24,6 +30,9 @@ export class UserController {
     }
   }
 
+  /**
+   * Làm mới Access Token bằng Refresh Token.
+   */
   async refreshToken(req: Request, res: Response) {
     try {
       const { refreshToken } = req.body;
@@ -35,6 +44,9 @@ export class UserController {
     }
   }
 
+  /**
+   * Đăng xuất khỏi hệ thống.
+   */
   async logout(req: Request, res: Response) {
     try {
       const userId = req.user?.id;
@@ -50,6 +62,9 @@ export class UserController {
   }
 
 
+  /**
+   * Lấy danh sách tất cả người dùng (Admin).
+   */
   async getAllUsers(req: Request, res: Response) {
     try {
       const users = await this.userService.getAllUsers();
@@ -59,6 +74,9 @@ export class UserController {
     }
   }
 
+  /**
+   * Lấy thông tin chi tiết của một người dùng theo ID.
+   */
   async getUserById(req: Request, res: Response) {
     try {
       const id = String(req.params.id);
@@ -72,6 +90,9 @@ export class UserController {
     }
   }
 
+  /**
+   * Tạo người dùng mới (Admin).
+   */
   async createUser(req: Request, res: Response) {
     try {
       const user = await this.userService.register(req.body);
@@ -82,6 +103,9 @@ export class UserController {
     }
   }
 
+  /**
+   * Cập nhật thông tin người dùng.
+   */
   async updateUser(req: Request, res: Response) {
     try {
       const id = String(req.params.id);
@@ -95,6 +119,9 @@ export class UserController {
     }
   }
 
+  /**
+   * Xóa người dùng khỏi hệ thống.
+   */
   async deleteUser(req: Request, res: Response) {
     try {
       const id = String(req.params.id);

@@ -32,6 +32,42 @@ export const submissionRouter = Router();
  */
 submissionRouter.get('/', authMiddleware, requireAdmin, submissionController.getAllSubmissions.bind(submissionController));
 
+/**
+ * @swagger
+ * /api/submissions/{id}:
+ *   put:
+ *     summary: Update a submission (Staff only)
+ *     tags: [Submissions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               values:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     fieldId:
+ *                       type: string
+ *                     value:
+ *                       type: string
+ *     responses:
+ *       200:
+ *         description: Submission updated
+ */
+submissionRouter.put('/:id', authMiddleware, requireAdminOrStaff, validateRequest(submitFormSchema), submissionController.updateSubmission.bind(submissionController));
+
 // === Router cho /api/forms (submit action) ===
 export const formSubmitRouter = Router();
 

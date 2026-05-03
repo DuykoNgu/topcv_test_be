@@ -63,10 +63,9 @@ export class SubmissionService {
   };
 
   /**
-   * Lấy tất cả submissions với đầy đủ thông tin:
-   * - Form cơ bản
-   * - User thực hiện
-   * - Danh sách values + thông tin field tương ứng
+   * Lấy danh sách tất cả các bản ghi đã nộp kèm thông tin chi tiết.
+   * Bao gồm thông tin về Form, User và các giá trị đã nhập của từng trường.
+   * @returns Danh sách submissions với đầy đủ chi tiết.
    */
   async getAllSubmissionsWithDetails(): Promise<any[]> {
     return this.submissionRepository.findWithDetails({
@@ -75,16 +74,12 @@ export class SubmissionService {
   }
 
   /**
-   * Nhân viên submit form:
-   * - Validate form tồn tại và có status ACTIVE
-   * - Validate tất cả fields thuộc về form
-   * - Tạo submission cùng values và trả về kết quả đầy đủ
-   */
-  /**
-   * Nhân viên submit form:
-   * - Validate form tồn tại và có status ACTIVE
-   * - Validate tất cả fields thuộc về form
-   * - Tạo submission cùng values và trả về kết quả đầy đủ
+   * Thực hiện lưu một bản ghi nộp form mới.
+   * Kiểm tra tính hợp lệ của form (phải tồn tại và đang hoạt động) 
+   * và tính hợp lệ của các trường thông tin được nộp.
+   * @param formId ID của form cần nộp.
+   * @param userId ID của người thực hiện nộp.
+   * @param values Danh sách các giá trị tương ứng với từng trường trong form.
    */
   async submitForm(formId: string, userId: string, values: Array<{ fieldId: string; value: string }>): Promise<any> {
     // Verify form exists and is active
@@ -137,7 +132,9 @@ export class SubmissionService {
   }
 
   /**
-   * Lấy lịch sử submissions của người dùng hiện tại cho một form cụ thể
+   * Lấy lịch sử các lần nộp form của người dùng hiện tại đối với một form cụ thể.
+   * @param formId ID của form cần lấy lịch sử.
+   * @param userId ID của người dùng.
    */
   async getMySubmissionsForForm(formId: string, userId: string): Promise<any[]> {
     return this.submissionRepository.findWithDetails({
@@ -147,6 +144,70 @@ export class SubmissionService {
       },
       include: SubmissionService.SUBMISSION_FULL_INCLUDE,
       orderBy: { submittedAt: "desc" },
+    });
+  }
+
+  /**
+   * Cập nhật thông tin của một bản ghi đã nộp trước đó.
+   * Quy trình: Kiểm tra quyền sở hữu, trạng thái form, sau đó xóa các giá trị cũ
+   * và lưu lại bộ giá trị mới trong một transaction.
+   * @param submissionId ID của bản ghi cần cập nhật.
+   * @param userId ID của người thực hiện (để kiểm tra quyền).
+   * @param values Bộ giá trị mới cho các trường.
+   */
+  async updateSubmission(submissionId: string, userId: string, values: Array<{ fieldId: string; value: string }>): Promise<any> {
+    const submission = await prisma.submission.findUnique({
+      where: { id: submissionId },
+      include: { form: true },
+    });
+
+    if (!submission || submission.deleteFlag) {
+      throw new Error("Submission not found");
+    }
+
+    if (submission.submittedBy !== userId) {
+      throw new Error("You do not have permission to edit this submission");
+    }
+
+    const form = submission.form;
+    if (form.status !== "ACTIVE" || form.deleteFlag) {
+      throw new Error("Form is not active");
+    }
+
+    const fieldIds = values.map((v) => v.fieldId);
+    const fields = await prisma.field.findMany({
+      where: {
+        id: { in: fieldIds },
+        formId: form.id,
+        deleteFlag: false,
+      },
+      select: { id: true },
+    });
+
+    if (fields.length !== fieldIds.length) {
+      throw new Error("One or more fields are invalid");
+    }
+
+    return prisma.$transaction(async (tx) => {
+      await tx.submissionValue.deleteMany({
+        where: { submissionId },
+      });
+
+      return tx.submission.update({
+        where: { id: submissionId },
+        data: {
+          updatedBy: userId,
+          version: { increment: 1 },
+          values: {
+            create: values.map((v) => ({
+              ...v,
+              createdBy: userId,
+              updatedBy: userId,
+            })),
+          },
+        },
+        include: SubmissionService.SUBMISSION_FULL_INCLUDE,
+      });
     });
   }
 }

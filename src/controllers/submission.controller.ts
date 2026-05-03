@@ -6,7 +6,8 @@ export class SubmissionController {
   private readonly submissionService = serviceFactory.createSubmissionService();
 
   /**
-   * GET /api/submissions
+   * Lấy toàn bộ danh sách các bản ghi (submissions) kèm thông tin chi tiết.
+   * Chỉ dành cho vai trò ADMIN.
    */
   async getAllSubmissions(req: Request, res: Response) {
     try {
@@ -18,7 +19,8 @@ export class SubmissionController {
   }
 
   /**
-   * POST /api/forms/:formId/submit
+   * Thực hiện nộp form khảo sát.
+   * Yêu cầu người dùng phải đăng nhập (Staff hoặc Admin).
    */
   async submitForm(req: Request, res: Response) {
     try {
@@ -48,7 +50,7 @@ export class SubmissionController {
   }
 
   /**
-   * GET /api/forms/:formId/submissions/me
+   * Lấy danh sách các bản ghi đã nộp của người dùng hiện tại theo form cụ thể.
    */
   async getMySubmissionsForForm(req: Request, res: Response) {
     try {
@@ -63,6 +65,40 @@ export class SubmissionController {
       ResponseHandler.success(res, submissions, 200);
     } catch (error: any) {
       ResponseHandler.internalError(res, "Failed to fetch your submissions", error.message);
+    }
+  }
+
+  /**
+   * Cập nhật nội dung bản ghi đã nộp.
+   * Cho phép người nộp sửa lại thông tin của mình.
+   */
+  async updateSubmission(req: Request, res: Response) {
+    try {
+      const submissionId = String(req.params.id);
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return ResponseHandler.unauthorized(res, "User not authenticated");
+      }
+
+      const values = req.body.values || [];
+
+      const updatedSubmission = await this.submissionService.updateSubmission(submissionId, userId, values);
+      ResponseHandler.success(res, updatedSubmission, 200);
+    } catch (error: any) {
+      if (error.message === "Submission not found") {
+        return ResponseHandler.notFound(res, error.message);
+      }
+      if (error.message === "You do not have permission to edit this submission") {
+        return ResponseHandler.forbidden(res, error.message);
+      }
+      if (error.message === "Form is not active") {
+        return ResponseHandler.badRequest(res, error.message);
+      }
+      if (error.message === "One or more fields are invalid") {
+        return ResponseHandler.badRequest(res, error.message);
+      }
+      ResponseHandler.badRequest(res, error.message || "Failed to update submission", error.details);
     }
   }
 }

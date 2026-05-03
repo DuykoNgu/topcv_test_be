@@ -20,7 +20,8 @@ export class FieldService {
   };
 
   /**
-   * Lấy field theo ID với đầy đủ thông tin
+   * Truy vấn chi tiết một trường thông tin dựa trên ID.
+   * @param id ID của trường cần lấy thông tin.
    */
   async getFieldById(id: string): Promise<any | null> {
     return this.fieldRepository.findById(id, {
@@ -29,7 +30,10 @@ export class FieldService {
   }
 
   /**
-   * Tạo field mới và trả về field với đầy đủ thông tin
+   * Tạo một trường thông tin mới cho một form cụ thể.
+   * @param formId ID của form sở hữu trường này.
+   * @param data Dữ liệu của trường mới.
+   * @param userId ID của người thực hiện tạo.
    */
   async createField(formId: string, data: any, userId?: string): Promise<any> {
     if (data.formId && data.formId !== formId) {
@@ -49,7 +53,11 @@ export class FieldService {
   }
 
   /**
-   * Cập nhật field theo ID và trả về field đã cập nhật
+   * Cập nhật thông tin của một trường đã tồn tại.
+   * @param formId ID của form chứa trường này.
+   * @param fieldId ID của trường cần cập nhật.
+   * @param data Dữ liệu cập nhật mới.
+   * @param userId ID của người thực hiện cập nhật.
    */
   async updateField(formId: string, fieldId: string, data: any, userId?: string): Promise<any | null> {
     const existingField = await this.getFieldById(fieldId);
@@ -71,7 +79,10 @@ export class FieldService {
   }
 
   /**
-   * Xóa mềm field theo ID và trả về field đã xóa
+   * Thực hiện xóa mềm (soft delete) một trường khỏi form.
+   * @param formId ID của form chứa trường này.
+   * @param fieldId ID của trường cần xóa.
+   * @param userId ID của người thực hiện xóa.
    */
   async deleteField(formId: string, fieldId: string, userId?: string): Promise<any | null> {
     const existingField = await this.getFieldById(fieldId);
