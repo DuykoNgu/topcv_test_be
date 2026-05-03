@@ -4,6 +4,7 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import { requireAdmin } from "../middleware/role.middleware";
 import { validateRequest } from "../middleware/validation.middleware";
 import { createFieldSchema, updateFieldSchema } from "../schemas/field.schema";
+import { asyncHandler } from "../middleware/error.middleware";
 
 
 const router = Router();
@@ -54,7 +55,7 @@ const fieldController = new FieldController();
  *       201:
  *         description: Field created
  */
-router.post('/:formId/fields', authMiddleware, requireAdmin, validateRequest(createFieldSchema), fieldController.createField.bind(fieldController));
+router.post('/:formId/fields', authMiddleware, requireAdmin, validateRequest(createFieldSchema), asyncHandler(fieldController.createField.bind(fieldController)));
 
 
 /**
@@ -97,7 +98,7 @@ router.post('/:formId/fields', authMiddleware, requireAdmin, validateRequest(cre
  *       200:
  *         description: Field updated
  */
-router.put('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateRequest(updateFieldSchema), fieldController.updateField.bind(fieldController));
+router.put('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateRequest(updateFieldSchema), asyncHandler(fieldController.updateField.bind(fieldController)));
 
 
 /**
@@ -123,7 +124,7 @@ router.put('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateReq
  *       200:
  *         description: Field deleted
  */
-router.delete('/:formId/fields/:fieldId', authMiddleware, requireAdmin, fieldController.deleteField.bind(fieldController));
+router.delete('/:formId/fields/:fieldId', authMiddleware, requireAdmin, asyncHandler(fieldController.deleteField.bind(fieldController)));
 
 
 export default router;

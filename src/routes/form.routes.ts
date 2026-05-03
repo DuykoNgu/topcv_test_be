@@ -4,6 +4,7 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import { requireAdmin, requireAdminOrStaff } from "../middleware/role.middleware";
 import { validateRequest } from "../middleware/validation.middleware";
 import { createFormSchema, updateFormSchema } from "../schemas/form.schema";
+import { asyncHandler } from "../middleware/error.middleware";
 
 
 const router = Router();
@@ -28,7 +29,7 @@ const formController = new FormController();
  *       200:
  *         description: List of forms
  */
-router.get('/', authMiddleware, requireAdmin, formController.getAllForms.bind(formController));
+router.get('/', authMiddleware, requireAdmin, asyncHandler(formController.getAllForms.bind(formController)));
 
 /**
  * @swagger
@@ -42,7 +43,7 @@ router.get('/', authMiddleware, requireAdmin, formController.getAllForms.bind(fo
  *       200:
  *         description: List of active forms
  */
-router.get('/active', authMiddleware, requireAdminOrStaff, formController.getActiveForms.bind(formController));
+router.get('/active', authMiddleware, requireAdminOrStaff, asyncHandler(formController.getActiveForms.bind(formController)));
 
 /**
  * @swagger
@@ -62,7 +63,7 @@ router.get('/active', authMiddleware, requireAdminOrStaff, formController.getAct
  *       200:
  *         description: Form details
  */
-router.get('/:id', authMiddleware, requireAdminOrStaff, formController.getFormById.bind(formController));
+router.get('/:id', authMiddleware, requireAdminOrStaff, asyncHandler(formController.getFormById.bind(formController)));
 
 /**
  * @swagger
@@ -89,7 +90,7 @@ router.get('/:id', authMiddleware, requireAdminOrStaff, formController.getFormBy
  *       201:
  *         description: Form created
  */
-router.post('/', authMiddleware, requireAdmin, validateRequest(createFormSchema), formController.createForm.bind(formController));
+router.post('/', authMiddleware, requireAdmin, validateRequest(createFormSchema), asyncHandler(formController.createForm.bind(formController)));
 
 
 /**
@@ -121,7 +122,7 @@ router.post('/', authMiddleware, requireAdmin, validateRequest(createFormSchema)
  *       200:
  *         description: Form updated
  */
-router.put('/:id', authMiddleware, requireAdmin, validateRequest(updateFormSchema), formController.updateForm.bind(formController));
+router.put('/:id', authMiddleware, requireAdmin, validateRequest(updateFormSchema), asyncHandler(formController.updateForm.bind(formController)));
 
 
 /**
@@ -142,7 +143,7 @@ router.put('/:id', authMiddleware, requireAdmin, validateRequest(updateFormSchem
  *       200:
  *         description: Form deleted
  */
-router.delete('/:id', authMiddleware, requireAdmin, formController.deleteForm.bind(formController));
+router.delete('/:id', authMiddleware, requireAdmin, asyncHandler(formController.deleteForm.bind(formController)));
 
 
 export default router;

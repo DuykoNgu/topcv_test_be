@@ -3,9 +3,17 @@ import { UserRepository } from "../repository/user.repository";
 import type { User } from "../generated/prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 export class UserService {
   private userRepository = new UserRepository();
+
+  /**
+   * Tạo mã hash SHA256 cho token.
+   */
+  private hashToken(token: string): string {
+    return crypto.createHash("sha256").update(token).digest("hex");
+  }
 
   /**
    * Kiểm tra định dạng email hợp lệ.
@@ -101,10 +109,8 @@ export class UserService {
         },
       },
     );
-
     const token = this.generateToken(user);
-
-    return { message: "User created successfully", data: { user, token } };
+    return { user, token };
   }
 
   /**
@@ -133,11 +139,10 @@ export class UserService {
     if (!isPasswordValid) {
       throw { statusCode: 401, message: "Email hoặc password không đúng" };
     }
-
     const token = this.generateToken(user);
     const refreshToken = await this.storeRefreshToken(user.id, this.generateRefreshToken(user));
 
-    return { message: "Login successful", data: { user, token, refreshToken } };
+    return { user, token, refreshToken };
   }
 
   /**
@@ -170,7 +175,7 @@ export class UserService {
    * Lưu trữ Refresh Token vào cơ sở dữ liệu.
    */
   async storeRefreshToken(userId: string, refreshToken: string): Promise<string> {
-    const tokenHash = await bcrypt.hash(refreshToken, 10);
+    const tokenHash = this.hashToken(refreshToken);
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     await this.userRepository.createRefreshToken(userId, tokenHash, expiresAt);
@@ -186,7 +191,7 @@ export class UserService {
       throw { statusCode: 400, message: "Refresh token is required" };
     }
 
-    const tokenHash = await bcrypt.hash(refreshToken, 10);
+    const tokenHash = this.hashToken(refreshToken);
     const storedToken = await this.userRepository.findRefreshToken(tokenHash);
 
     if (!storedToken) {
@@ -224,13 +229,6 @@ export class UserService {
 
     await this.userRepository.revokeAllRefreshTokens(userId);
     return { message: "Logged out successfully" };
-  }
-
-  /**
-   * Xác thực tính hợp lệ của token.
-   */
-  verifyToken(token: string): object {
-    return jwt.verify(token, process.env.JWT_SECRET || "secret") as object;
   }
 
   /**

@@ -40,14 +40,21 @@ export class FormService {
   /**
    * Lấy danh sách các mẫu form có phân trang.
    * Thường dùng cho trang quản trị (Admin).
-   * @param skip Số bản ghi bỏ qua.
-   * @param take Số bản ghi cần lấy.
+   * @param page Trang hiện tại.
+   * @param limit Số bản ghi trên một trang.
    */
-  async getPaginatedForms(skip: number, take: number): Promise<{ data: any[]; total: number }> {
-    return this.formRepository.findWithPagination(skip, take, {
+  async getPaginatedForms(page: number, limit: number): Promise<{ data: any[]; total: number; totalPages: number }> {
+    const skip = (page - 1) * limit;
+    const { data, total } = await this.formRepository.findWithPagination(skip, limit, {
       select: FormService.FORM_WITH_FIELDS_SELECT,
       orderBy: { order: "asc" },
     });
+
+    return {
+      data,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   /**

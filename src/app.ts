@@ -8,7 +8,7 @@ import fieldRoutes from "./routes/field.routes";
 import { submissionRouter, formSubmitRouter } from "./routes/submission.routes";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
-import { errorHandler } from "./middleware/auth.middleware";
+import { globalErrorHandler } from "./middleware/error.middleware";
 
 
 const app = express();
@@ -32,5 +32,5 @@ app.use("/api/submissions", submissionRouter);
 
 app.use("/api", userRoutes);
 
-app.use(errorHandler);
+app.use(globalErrorHandler);
 export default app;
