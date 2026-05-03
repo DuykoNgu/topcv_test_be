@@ -61,8 +61,7 @@ export class FormController {
    */
   async createForm(req: Request, res: Response) {
     try {
-      const data = { ...req.body, createdBy: req.user?.id, updatedBy: req.user?.id };
-      const form = await this.formService.createForm(data);
+      const form = await this.formService.createForm(req.body, req.user?.id);
       ResponseHandler.success(res, form, 201);
     } catch (error: any) {
       if (error.code === "P2002") {
@@ -79,8 +78,7 @@ export class FormController {
   async updateForm(req: Request, res: Response) {
     try {
       const id = String(req.params.id);
-      const data = { ...req.body, updatedBy: req.user?.id };
-      const form = await this.formService.updateForm(id, data);
+      const form = await this.formService.updateForm(id, req.body, req.user?.id);
       if (!form) {
         return ResponseHandler.notFound(res, "Form not found");
       }

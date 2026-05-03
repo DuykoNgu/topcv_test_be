@@ -69,8 +69,13 @@ export class FormService {
   /**
    * Tạo form mới và trả về form với danh sách fields
    */
-  async createForm(data: Prisma.FormCreateInput): Promise<any> {
-    return this.formRepository.create(data, {
+  async createForm(data: any, userId?: string): Promise<any> {
+    const formData = {
+      ...data,
+      createdBy: userId,
+      updatedBy: userId,
+    };
+    return this.formRepository.create(formData, {
       select: FormService.FORM_WITH_FIELDS_SELECT,
     });
   }
@@ -78,8 +83,12 @@ export class FormService {
   /**
    * Cập nhật form theo ID và trả về form đã cập nhật (kèm fields)
    */
-  async updateForm(id: string, data: Prisma.FormUpdateInput): Promise<any | null> {
-    return this.formRepository.update(id, data, {
+  async updateForm(id: string, data: any, userId?: string): Promise<any | null> {
+    const formData = {
+      ...data,
+      updatedBy: userId,
+    };
+    return this.formRepository.update(id, formData, {
       select: FormService.FORM_WITH_FIELDS_SELECT,
     });
   }
@@ -87,10 +96,10 @@ export class FormService {
   /**
    * Xóa mềm form theo ID và trả về form đã xóa
    */
-  async deleteForm(id: string, updatedBy?: string): Promise<any | null> {
+  async deleteForm(id: string, userId?: string): Promise<any | null> {
     return this.formRepository.softDelete(id, {
       select: FormService.FORM_WITH_FIELDS_SELECT,
-      updatedBy,
+      updatedBy: userId,
     });
   }
 }

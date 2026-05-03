@@ -31,8 +31,19 @@ export class FieldService {
   /**
    * Tạo field mới và trả về field với đầy đủ thông tin
    */
-  async createField(data: Prisma.FieldCreateInput): Promise<any> {
-    return this.fieldRepository.create(data, {
+  async createField(formId: string, data: any, userId?: string): Promise<any> {
+    if (data.formId && data.formId !== formId) {
+      throw new Error("Form ID mismatch");
+    }
+
+    const fieldData = {
+      ...data,
+      formId,
+      createdBy: userId,
+      updatedBy: userId,
+    };
+
+    return this.fieldRepository.create(fieldData, {
       select: FieldService.FIELD_PROJECTION,
     });
   }
@@ -40,8 +51,21 @@ export class FieldService {
   /**
    * Cập nhật field theo ID và trả về field đã cập nhật
    */
-  async updateField(id: string, data: Prisma.FieldUpdateInput): Promise<any | null> {
-    return this.fieldRepository.update(id, data, {
+  async updateField(formId: string, fieldId: string, data: any, userId?: string): Promise<any | null> {
+    const existingField = await this.getFieldById(fieldId);
+    if (!existingField) {
+      throw new Error("Field not found");
+    }
+    if (existingField.formId !== formId) {
+      throw new Error("Field does not belong to this form");
+    }
+
+    const fieldData = {
+      ...data,
+      updatedBy: userId,
+    };
+
+    return this.fieldRepository.update(fieldId, fieldData, {
       select: FieldService.FIELD_PROJECTION,
     });
   }
@@ -49,10 +73,18 @@ export class FieldService {
   /**
    * Xóa mềm field theo ID và trả về field đã xóa
    */
-  async deleteField(id: string, updatedBy?: string): Promise<any | null> {
-    return this.fieldRepository.softDelete(id, {
+  async deleteField(formId: string, fieldId: string, userId?: string): Promise<any | null> {
+    const existingField = await this.getFieldById(fieldId);
+    if (!existingField) {
+      throw new Error("Field not found");
+    }
+    if (existingField.formId !== formId) {
+      throw new Error("Field does not belong to this form");
+    }
+
+    return this.fieldRepository.softDelete(fieldId, {
       select: FieldService.FIELD_PROJECTION,
-      updatedBy,
+      updatedBy: userId,
     });
   }
 }

@@ -23,21 +23,15 @@ export class SubmissionController {
   async submitForm(req: Request, res: Response) {
     try {
       const formId = String(req.params.formId);
-      const submittedBy = req.user?.id;
+      const userId = req.user?.id;
 
-      if (!submittedBy) {
+      if (!userId) {
         return ResponseHandler.unauthorized(res, "User not authenticated");
       }
 
-      const submissionData = {
-        formId,
-        submittedBy,
-        createdBy: submittedBy,
-        updatedBy: submittedBy,
-        values: req.body.values || [],
-      };
+      const values = req.body.values || [];
 
-      const submission = await this.submissionService.submitForm(submissionData);
+      const submission = await this.submissionService.submitForm(formId, userId, values);
       ResponseHandler.success(res, submission, 201);
     } catch (error: any) {
       if (error.message === "Form not found") {
