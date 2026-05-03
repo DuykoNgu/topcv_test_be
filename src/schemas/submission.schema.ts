@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const submitFormSchema = z.object({
-  answers: z.array(
+  values: z.array(
     z.object({
-      fieldId: z.string().uuid("Invalid field ID format"),
+      fieldId: z.string().uuid("Định dạng ID trường không hợp lệ"),
       value: z.any(),
     })
-  ).min(1, "At least one answer is required"),
+  ).min(1, "Yêu cầu ít nhất một giá trị"),
 });

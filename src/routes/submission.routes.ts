@@ -56,7 +56,7 @@ export const formSubmitRouter = Router();
  *           schema:
  *             type: object
  *             properties:
- *               answers:
+ *               values:
  *                 type: array
  *                 items:
  *                   type: object

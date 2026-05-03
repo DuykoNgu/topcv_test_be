@@ -112,9 +112,10 @@ Cơ chế DI được triển khai tập trung tại thư mục `src/factories/`
 Các Middleware được xây dựng để xử lý các logic xuyên suốt (cross-cutting concerns):
 - **Auth Middleware**: Xác thực tính hợp lệ của Access Token.
 - **Role Middleware**: Kiểm tra quyền truy cập của người dùng (RBAC) dựa trên vai trò trước khi vào Controller.
-- **Validation Middleware**: Sử dụng để kiểm tra tính hợp lệ của dữ liệu đầu vào (Payload validation).
+- **Validation Middleware (Zod)**: Sử dụng thư viện **Zod** để định nghĩa schema và kiểm tra tính hợp lệ của dữ liệu đầu vào (Request Body). Nếu dữ liệu không khớp với schema, middleware sẽ tự động trả về lỗi 400 kèm chi tiết các trường bị lỗi.
 
 ### 4. Authentication & Authorization
+
 Hệ thống sử dụng cơ chế **JWT (JSON Web Token)**:
 - **Access Token**: Dùng để xác thực ngắn hạn cho các request.
 - **Refresh Token**: Lưu trong Database và HttpOnly Cookie để cấp lại Access Token mới khi hết hạn, đảm bảo trải nghiệm người dùng liền mạch và an toàn.

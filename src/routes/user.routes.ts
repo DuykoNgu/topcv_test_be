@@ -28,15 +28,18 @@ const userController = new UserController();
  *           schema:
  *             type: object
  *             required:
- *               - name
+ *               - username
  *               - email
  *               - password
+ *               - confirmPassword
  *             properties:
- *               name:
+ *               username:
  *                 type: string
  *               email:
  *                 type: string
  *               password:
+ *                 type: string
+ *               confirmPassword:
  *                 type: string
  *     responses:
  *       201:
