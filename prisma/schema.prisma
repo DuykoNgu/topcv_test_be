@@ -1,0 +1,191 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUM
+// ============================================================
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum FormStatus {
+  ACTIVE
+  DRAFT
+}
+
+enum FieldType {
+  TEXT
+  NUMBER
+  DATE
+  COLOR
+  SELECT
+}
+
+// ============================================================
+// BASE AUDIT FIELDS (áp dụng thủ công cho từng bảng)
+// versions   = optimistic locking
+// createdBy  = người tạo
+// updatedBy  = người sửa cuối
+// deleteFlag = soft delete
+// ============================================================
+
+// ============================================================
+// USER
+// ============================================================
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  name         String   @default("")
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(STAFF)
+
+  version      Int      @default(1)
+  createdBy    String?  @map("created_by")
+  updatedBy    String?  @map("updated_by")
+  deleteFlag   Boolean  @default(false) @map("delete_flag")
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  submissions  Submission[]
+  refreshTokens RefreshToken[]
+  createdForms  Form[]       @relation("FormCreator")
+  modifiedForms Form[]       @relation("FormModifier")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @map("token_hash")
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  revoked   Boolean  @default(false)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("refresh_tokens")
+}
+
+// ============================================================
+// FORM
+// ============================================================
+
+model Form {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  order       Int        @default(0)
+  status      FormStatus @default(DRAFT)
+
+  version      Int      @default(1)
+  createdBy    String?  @map("created_by")
+  updatedBy    String?  @map("updated_by")
+  deleteFlag   Boolean  @default(false) @map("delete_flag")
+
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  creator     User?      @relation("FormCreator", fields: [createdBy], references: [id])
+  modifier    User?      @relation("FormModifier", fields: [updatedBy], references: [id])
+
+  fields      Field[]
+  submissions Submission[]
+
+  @@map("forms")
+}
+
+// ============================================================
+// FIELD
+// ============================================================
+
+model Field {
+  id              String    @id @default(uuid())
+  formId          String    @map("form_id")
+  label           String
+  type            FieldType
+  order           Int       @default(0)
+  required        Boolean   @default(false)
+
+  options         Json?
+  validationRules Json?     @map("validation_rules")
+
+  version      Int      @default(1)
+  createdBy    String?  @map("created_by")
+  updatedBy    String?  @map("updated_by")
+  deleteFlag   Boolean  @default(false) @map("delete_flag")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  form             Form              @relation(fields: [formId], references: [id], onDelete: Cascade)
+  submissionValues SubmissionValue[]
+
+  @@map("fields")
+}
+
+// ============================================================
+// SUBMISSION
+// ============================================================
+
+model Submission {
+  id          String   @id @default(uuid())
+  formId      String   @map("form_id")
+  submittedBy String   @map("submitted_by")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  version      Int      @default(1)
+  createdBy    String?  @map("created_by")
+  updatedBy    String?  @map("updated_by")
+  deleteFlag   Boolean  @default(false) @map("delete_flag")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  form   Form              @relation(fields: [formId], references: [id], onDelete: Cascade)
+  user   User              @relation(fields: [submittedBy], references: [id])
+  values SubmissionValue[]
+
+  @@map("submissions")
+}
+
+// ============================================================
+// SUBMISSION VALUE
+// ============================================================
+
+model SubmissionValue {
+  id           String @id @default(uuid())
+  submissionId String @map("submission_id")
+  fieldId      String @map("field_id")
+  value        String?
+
+  version      Int      @default(1)
+  createdBy    String?  @map("created_by")
+  updatedBy    String?  @map("updated_by")
+  deleteFlag   Boolean  @default(false) @map("delete_flag")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  field      Field      @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, fieldId])
+  @@map("submission_values")
+}
