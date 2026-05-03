@@ -142,7 +142,8 @@ router.put('/:id', authMiddleware, requireAdmin, validateRequest(updateFormSchem
  *       200:
  *         description: Form deleted
  */
-router.delete('/:id', authMiddleware, requireAdmin, validateRequest, formController.deleteForm.bind(formController));
+router.delete('/:id', authMiddleware, requireAdmin, formController.deleteForm.bind(formController));
+
 
 export default router;
 

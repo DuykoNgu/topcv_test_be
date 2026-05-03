@@ -123,7 +123,8 @@ router.put('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateReq
  *       200:
  *         description: Field deleted
  */
-router.delete('/:formId/fields/:fieldId', authMiddleware, requireAdmin, validateRequest, fieldController.deleteField.bind(fieldController));
+router.delete('/:formId/fields/:fieldId', authMiddleware, requireAdmin, fieldController.deleteField.bind(fieldController));
+
 
 export default router;
 
